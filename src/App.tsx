@@ -1,4 +1,5 @@
 import { QueryClientProvider, QueryClient } from 'react-query'
+import LoginForm from './components/LoginForm'
 
 const queryClient = new QueryClient()
 
@@ -7,7 +8,7 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className='text-3xl font-bold underline'>Hello World</div>
+      <LoginForm />
     </QueryClientProvider>
   )
 }

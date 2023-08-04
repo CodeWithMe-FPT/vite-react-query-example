@@ -1,5 +1,6 @@
 import { QueryClientProvider, QueryClient } from 'react-query';
-import LoginForm from './components/LoginForm';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { publicRoutes } from '@/routes';
 
 const queryClient = new QueryClient();
 
@@ -7,9 +8,18 @@ function App() {
   // const [count, setCount] = useState(0)
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <LoginForm />
-    </QueryClientProvider>
+    <Router>
+      <QueryClientProvider client={queryClient}>
+        <div className='App'>
+          <Routes>
+            {publicRoutes.map((route, index) => {
+              const Page = route.component;
+              return <Route key={index} path={route.path} element={<Page />}></Route>;
+            })}
+          </Routes>
+        </div>
+      </QueryClientProvider>
+    </Router>
   );
 }
 

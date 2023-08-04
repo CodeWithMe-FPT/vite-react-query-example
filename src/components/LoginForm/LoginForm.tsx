@@ -1,6 +1,32 @@
 // import React from 'react'
 
+import { login } from '@/services/APIService';
+import { AxiosError } from 'axios';
+import { FormEvent, useRef, useState } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 export default function LoginForm() {
+  const formRef = useRef() as React.MutableRefObject<HTMLFormElement>;
+  const [error, setError] = useState('');
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    e.nativeEvent.preventDefault();
+    const email = formRef.current[0] as HTMLInputElement;
+    const password = formRef.current[1] as HTMLInputElement;
+    try {
+      const res = await toast.promise(login(email.value, password.value), {
+        pending: 'Đang đăng nhập',
+        error: 'Đăng nhập thất bại, vui lòng đăng nhập lại',
+        success: 'Đăng nhập thành công '
+      });
+      document.cookie = `x-auth-token=${res}`;
+      setError('');
+    } catch (_error) {
+      const error = (_error as AxiosError).response?.data;
+      setError((error as Error).message);
+    }
+  };
   return (
     <div className='flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8'>
       <div className='sm:mx-auto sm:w-full sm:max-w-sm'>
@@ -15,7 +41,7 @@ export default function LoginForm() {
       </div>
 
       <div className='mt-10 sm:mx-auto sm:w-full sm:max-w-sm'>
-        <form className='space-y-6' action='#' method='POST'>
+        <form ref={formRef} className='space-y-6' onSubmit={handleSubmit}>
           <div>
             <label htmlFor='email' className='block text-sm font-medium leading-6 text-gray-900'>
               Email address
@@ -27,7 +53,7 @@ export default function LoginForm() {
                 type='email'
                 autoComplete='email'
                 required
-                className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-3'
               />
             </div>
           </div>
@@ -50,10 +76,12 @@ export default function LoginForm() {
                 type='password'
                 autoComplete='current-password'
                 required
-                className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                className='block p-3 w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
               />
             </div>
           </div>
+
+          {error.length > 0 && <p className='text-red-500'>{error}</p>}
 
           <div>
             <button
@@ -72,6 +100,7 @@ export default function LoginForm() {
           </a>
         </p>
       </div>
+      <ToastContainer />
     </div>
-  )
+  );
 }

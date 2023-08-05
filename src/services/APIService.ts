@@ -13,3 +13,11 @@ export const login = (email: string, password: string): Promise<AxiosResponse> =
   });
   return promise;
 };
+
+export const search = async (searchName: string): Promise<AxiosResponse> => {
+  const promise = axios({
+    method: 'GET',
+    url: `${API_ENDPOINT}/product/search?searchName=${searchName}`
+  });
+  return promise;
+};

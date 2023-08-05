@@ -1,17 +1,25 @@
 // import React from 'react'
 
+import { actions, states } from '@/recoil';
 import { login } from '@/services/APIService';
 import { AxiosError } from 'axios';
 import { FormEvent, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useSetRecoilState } from 'recoil';
 
 export default function LoginForm() {
   const formRef = useRef() as React.MutableRefObject<HTMLFormElement>;
+  const buttonRef = useRef() as React.MutableRefObject<HTMLButtonElement>;
+  const stateData = useSetRecoilState(states.handleData);
+  const navigate = useNavigate();
+
   const [error, setError] = useState('');
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     e.nativeEvent.preventDefault();
+    buttonRef.current.setAttribute('disabled', 'true');
     const email = formRef.current[0] as HTMLInputElement;
     const password = formRef.current[1] as HTMLInputElement;
     try {
@@ -22,9 +30,13 @@ export default function LoginForm() {
       });
       document.cookie = `x-auth-token=${res}`;
       setError('');
+      stateData(actions.setAdminRole(true));
+      buttonRef.current.removeAttribute('disabled');
+      navigate('/search');
     } catch (_error) {
       const error = (_error as AxiosError).response?.data;
       setError((error as Error).message);
+      buttonRef.current.removeAttribute('disabled');
     }
   };
   return (
@@ -85,6 +97,7 @@ export default function LoginForm() {
 
           <div>
             <button
+              ref={buttonRef}
               type='submit'
               className='flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600'
             >
